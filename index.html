@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f0e8">
+  <meta name="description" content="不背单词风格的本地 HTML 学习演示版。">
+  <title>不背单词 · HTML 学习演示版</title>
+  <style>
+    :root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#28333a;background:#f5f0e8;font-synthesis:none}
+    *{box-sizing:border-box}
+    body{margin:0;min-width:320px}
+    button{font:inherit;cursor:pointer}
+    button:disabled{cursor:not-allowed;opacity:.48}
+    button:focus-visible{outline:3px solid #164d52;outline-offset:3px}
+    .shell{min-height:100vh;max-width:1120px;margin:auto;padding:30px 42px 56px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#123f45;color:#fff;font-size:24px;font-weight:800;transform:rotate(-8deg)}
+    .brand-name{font-size:21px;font-weight:800;letter-spacing:-.04em}
+    .brand-sub{font-size:11px;color:#7b817f;margin-top:2px;letter-spacing:.08em}
+    .date-label{font-size:13px;color:#777c7a}
+    .notice{display:flex;align-items:center;gap:9px;background:#fff5db;color:#80522b;border:1px solid #eed9ac;border-radius:14px;padding:12px 15px;margin:0 0 18px;font-size:13px;line-height:1.5}
+    .notice[hidden]{display:none}
+    .desktop-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.85fr);gap:22px;align-items:start}
+    .stack{display:grid;gap:20px}
+    .hero{position:relative;overflow:hidden;min-height:276px;border-radius:28px;background:linear-gradient(125deg,#f49a63 0%,#f1b981 64%,#f6d5a3 100%);padding:34px 36px;box-shadow:0 20px 45px rgba(170,105,59,.13)}
+    .hero:before,.hero:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.36);border-radius:50%;pointer-events:none}
+    .hero:before{width:390px;height:390px;right:-125px;top:-205px}
+    .hero:after{width:270px;height:270px;right:65px;bottom:-215px}
+    .hero>*{position:relative;z-index:1}
+    .eyebrow{margin:0 0 11px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+    .hero .eyebrow{color:#684a39}
+    .hero h1{margin:0;font-size:clamp(30px,4vw,47px);line-height:1.18;letter-spacing:-.06em;color:#253b39}
+    .hero h1 em{font-family:Georgia,serif;font-style:italic;font-weight:500}
+    .hero p{max-width:390px;line-height:1.7;font-size:14px;color:#5e544b;margin:18px 0 25px}
+    .hero-count{position:absolute;right:34px;bottom:26px;display:flex;align-items:baseline;gap:6px;color:#795338;opacity:.84}
+    .hero-count b{font-size:48px;font-family:Georgia,serif;font-weight:500;line-height:1}
+    .hero-count span{font-size:12px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:14px 21px;min-height:48px;font-size:14px;font-weight:700;transition:transform .16s,background .16s,box-shadow .16s;text-decoration:none}
+    .btn:not(:disabled):hover{transform:translateY(-2px)}
+    .btn-dark{background:#163f43;color:white;box-shadow:0 9px 18px rgba(20,62,65,.17)}
+    .btn-dark:not(:disabled):hover{background:#0a3034}
+    .btn-light{background:#fff;color:#264449}
+    .btn-soft{background:#f1f5f2;color:#25545a}
+    .btn-outline{background:transparent;border:1px solid #cbd4d0;color:#3f5959}
+    .btn-wrong{background:#f7e5d9;color:#a25435}
+    .btn-full{width:100%}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 14px}
+    .section-title h2{font-size:18px;margin:0;letter-spacing:-.03em}
+    .section-title span,.muted{color:#8b918e;font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .stat{background:#fff;border:1px solid #eeeae3;border-radius:19px;padding:20px;min-height:107px}
+    .stat .num{font-size:30px;line-height:1;font-weight:750;letter-spacing:-.06em}
+    .stat .label{font-size:12px;color:#88908b;margin-top:13px}
+    .stat:nth-child(2) .num{color:#d47743}
+    .stat:nth-child(3) .num{color:#266d63}
+    .panel{background:#fff;border:1px solid #eeeae3;border-radius:24px;padding:24px}
+    .book-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+    .book-icon{flex:none;display:grid;place-items:center;width:44px;height:51px;border-radius:5px 11px 11px 5px;background:#244d52;color:#fff;font-family:Georgia,serif;font-weight:bold;font-size:20px;box-shadow:inset 5px 0 rgba(255,255,255,.15)}
+    .book-head h3{margin:0;font-size:17px}
+    .book-head p{margin:5px 0 0;color:#939a96;font-size:12px}
+    .progress-line{height:7px;border-radius:20px;background:#e9efec;overflow:hidden}
+    .progress-fill{height:100%;border-radius:20px;background:#ed995d;min-width:0;transition:width .3s}
+    .progress-caption{display:flex;justify-content:space-between;gap:8px;margin:10px 0 17px;color:#818985;font-size:12px}
+    .link-btn{background:none;border:0;padding:0;color:#32666a;font-weight:700;font-size:13px}
+    .route-list{display:grid;gap:12px}
+    .route{display:flex;align-items:center;gap:13px;border:1px solid #ecefe9;background:#fff;border-radius:19px;padding:17px;text-align:left;width:100%;transition:transform .16s,box-shadow .16s}
+    .route:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(45,65,60,.08)}
+    .route-icon{flex:none;display:grid;place-items:center;width:43px;height:43px;border-radius:13px;background:#fceadb;color:#bc683f;font-size:21px}
+    .route:nth-child(2) .route-icon{background:#e3f0eb;color:#3a806f}
+    .route-text{flex:1;min-width:0}
+    .route-text strong{display:block;font-size:15px;color:#303c3d}
+    .route-text small{display:block;color:#9ca39e;font-size:12px;margin-top:5px}
+    .route-arrow{color:#aeb5b0;font-size:21px}
+    .bottom-nav{display:flex;gap:6px;justify-content:center;margin-top:30px}
+    .nav-button{border:0;background:transparent;color:#8d9690;border-radius:12px;padding:10px 16px;font-size:13px;font-weight:700}
+    .nav-button.active{background:#e7ede6;color:#24545a}
+    .page-head{display:flex;align-items:flex-start;gap:15px;margin:20px 0 25px}
+    .back{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;border:1px solid #e4e7e0;background:#fff;color:#3d5959;font-size:22px;flex:none}
+    .page-head h1{font-size:26px;letter-spacing:-.06em;margin:0}
+    .page-head p{margin:6px 0 0;color:#8c948d;font-size:13px;line-height:1.5}
+    .book-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .book-option{border:1px solid #e8ebe5;background:#fff;border-radius:22px;padding:23px;text-align:left;width:100%;min-height:183px;transition:transform .16s,border-color .16s,box-shadow .16s}
+    .book-option:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(45,65,60,.08)}
+    .book-option.selected{border:2px solid #dc925b}
+    .book-option .book-icon{margin-bottom:14px}
+    .book-option h2{font-size:17px;margin:0 0 6px;color:#2d3d3e}
+    .book-option p{font-size:12px;color:#929a95;line-height:1.5;margin:0}
+    .tag{display:inline-flex;align-items:center;border-radius:20px;padding:5px 9px;background:#f7eee4;color:#ac7047;font-size:11px;font-weight:700;margin-top:14px}
+    .study-wrap{max-width:720px;margin:auto}
+    .session-progress{display:flex;align-items:center;gap:12px;margin:16px 0 24px}
+    .session-progress span{color:#888f89;font-size:12px;white-space:nowrap}
+    .session-progress .progress-line{flex:1;background:#e6ebe6}
+    .word-card{background:#fff;border:1px solid #ecebe4;border-radius:27px;min-height:440px;padding:34px 36px;box-shadow:0 18px 40px rgba(54,65,53,.06)}
+    .word-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .word-category{color:#d08451;font-size:11px;font-weight:800;letter-spacing:.16em}
+    .audio{width:40px;height:40px;border:0;border-radius:50%;background:#edf3ef;color:#265b61;display:grid;place-items:center;font-size:20px}
+    .word{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(43px,8vw,66px);color:#203f43;line-height:1.12;letter-spacing:-.055em;margin:24px 0 5px;overflow-wrap:anywhere}
+    .phonetic{font-family:Georgia,serif;font-size:17px;color:#9aa59e;margin:0 0 28px}
+    .divider{height:1px;background:#ecefe9;margin:0 0 26px}
+    .example-label{color:#a3a8a2;font-size:11px;font-weight:800;letter-spacing:.14em;margin:0 0 10px}
+    .example{color:#3e4e4d;font-size:18px;line-height:1.65;margin:0;max-width:580px;font-family:Georgia,"Times New Roman",serif}
+    .example strong{color:#d27947}
+    .meaning{margin-top:24px;border-top:1px solid #ecefe9;padding-top:22px;animation:fade .25s ease}
+    .meaning strong{display:block;font-size:20px;color:#25484a}
+    .meaning p{font-size:14px;color:#858f87;line-height:1.65;margin:12px 0 0}
+    .meaning-placeholder{margin-top:24px;padding:18px;border-radius:14px;background:#f7f8f4;color:#a1a9a0;font-size:13px}
+    .study-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:17px}
+    .study-actions .btn-full{grid-column:1/-1}
+    .empty{padding:54px 24px;text-align:center;background:#fff;border:1px solid #eeeae3;border-radius:23px}
+    .empty-icon{font-family:Georgia,serif;font-size:47px;color:#e5a572}
+    .empty h2{font-size:20px;margin:12px 0 7px}
+    .empty p{color:#929991;font-size:13px;line-height:1.7;margin:0 auto 22px;max-width:360px}
+    .complete{background:linear-gradient(145deg,#f6ad77,#f4d0a6);border-radius:26px;padding:50px 32px;text-align:center}
+    .complete-graphic{font-size:55px;font-family:Georgia,serif;color:#245057}
+    .complete h1{font-size:28px;margin:10px 0 8px}
+    .complete p{color:#735a46;font-size:14px;line-height:1.7;margin:0 0 24px}
+    .complete-summary{display:flex;justify-content:center;gap:22px;margin-bottom:25px;font-size:13px;color:#5f5548}
+    .complete-summary b{font-size:22px;color:#244e50;margin-right:5px}
+    .progress-panel{max-width:720px;margin:auto}
+    .progress-big{display:flex;align-items:center;gap:24px;margin:10px 0 28px}
+    .progress-ring{--pct:0;display:grid;place-items:center;flex:none;width:125px;height:125px;border-radius:50%;background:conic-gradient(#eb965c calc(var(--pct)*1%),#eaf0ec 0)}
+    .progress-ring:after{content:attr(data-label);display:grid;place-items:center;width:94px;height:94px;border-radius:50%;background:#fff;color:#235155;font-size:24px;font-weight:800}
+    .progress-big h2{margin:0 0 8px;font-size:21px}
+    .progress-big p{margin:0;color:#939b94;font-size:13px;line-height:1.6}
+    .word-chip-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+    .word-chip{border-radius:30px;background:#edf2ee;padding:8px 12px;color:#4e6563;font-family:Georgia,serif;font-size:14px}
+    .footnote{color:#a1a59c;font-size:11px;line-height:1.6;margin:18px 2px 0}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:790px){.shell{max-width:610px;padding:22px 18px 92px}.desktop-grid{display:block}.desktop-grid>.stack:nth-child(2){margin-top:20px}.hero{min-height:285px}.hero-count{right:24px;bottom:24px}}
+    @media(max-width:500px){.shell{padding:18px 15px 84px}.topbar{margin-bottom:19px}.brand-name{font-size:18px}.brand-mark{width:37px;height:37px;font-size:21px}.date-label{font-size:11px}.hero{padding:28px 25px;min-height:300px;border-radius:24px}.hero h1{font-size:34px}.hero p{max-width:265px;font-size:13px}.hero-count{right:21px;bottom:19px}.hero-count b{font-size:39px}.stats{gap:8px}.stat{padding:16px 12px;min-height:95px}.stat .num{font-size:25px}.stat .label{font-size:11px}.panel{padding:19px}.book-grid{grid-template-columns:1fr;gap:11px}.book-option{min-height:unset;padding:19px}.book-option .book-icon{margin-bottom:12px}.page-head{margin:7px 0 19px}.word-card{padding:25px 23px;min-height:420px}.word{margin-top:25px}.example{font-size:16px}.study-actions{grid-template-columns:1fr 1fr}.btn{padding:13px 11px}.progress-big{gap:15px}.progress-ring{width:108px;height:108px}.progress-ring:after{width:82px;height:82px;font-size:20px}}
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    "use strict";
+    const STORAGE_KEY = "bbdc-html-demo-v1";
+    const INTERVALS = [1, 3, 7, 14];
+    const BOOKS = {
+      cet4: {
+        name: "四级核心 · 示例词书", short: "CET-4", description: "从常见学习与生活语境开始", words: [
+          {id:"adapt",word:"adapt",phonetic:"/əˈdæpt/",meaning:"v. 适应；改编",example:"We learn to adapt when our plans change.",translation:"当计划改变时，我们学着适应。"},
+          {id:"approach",word:"approach",phonetic:"/əˈproʊtʃ/",meaning:"n. 方法；v. 接近",example:"A fresh approach made the problem easier.",translation:"一种新方法让问题变得更容易。"},
+          {id:"clarify",word:"clarify",phonetic:"/ˈklærəfaɪ/",meaning:"v. 澄清；阐明",example:"Could you clarify the final step for me?",translation:"你能为我说明最后一步吗？"},
+          {id:"context",word:"context",phonetic:"/ˈkɑːntekst/",meaning:"n. 语境；背景",example:"The word is easier to remember in context.",translation:"把单词放在语境中更容易记住。"},
+          {id:"deliver",word:"deliver",phonetic:"/dɪˈlɪvər/",meaning:"v. 递送；完成",example:"The team will deliver its report on Friday.",translation:"团队将在周五提交报告。"},
+          {id:"emerge",word:"emerge",phonetic:"/ɪˈmɜːrdʒ/",meaning:"v. 出现；显露",example:"A clear pattern began to emerge from the data.",translation:"数据中开始显现出清晰的规律。"},
+          {id:"evidence",word:"evidence",phonetic:"/ˈevɪdəns/",meaning:"n. 证据；依据",example:"Good decisions need reliable evidence.",translation:"好的决定需要可靠的依据。"},
+          {id:"frequent",word:"frequent",phonetic:"/ˈfriːkwənt/",meaning:"adj. 频繁的",example:"Frequent practice helps the new words stay with you.",translation:"经常练习有助于记住新词。"},
+          {id:"identify",word:"identify",phonetic:"/aɪˈdentɪfaɪ/",meaning:"v. 识别；确定",example:"Try to identify the main idea first.",translation:"先试着找出中心思想。"},
+          {id:"maintain",word:"maintain",phonetic:"/meɪnˈteɪn/",meaning:"v. 保持；维护",example:"She maintains a steady study routine.",translation:"她保持着稳定的学习习惯。"},
+          {id:"option",word:"option",phonetic:"/ˈɑːpʃən/",meaning:"n. 选择；选项",example:"You have another option if this one fails.",translation:"如果这个办法行不通，你还有别的选择。"},
+          {id:"precise",word:"precise",phonetic:"/prɪˈsaɪs/",meaning:"adj. 准确的；精确的",example:"Please give me a precise answer.",translation:"请给我一个准确的答复。"},
+          {id:"reflect",word:"reflect",phonetic:"/rɪˈflekt/",meaning:"v. 反映；认真思考",example:"Take a moment to reflect on what you learned.",translation:"花点时间回想你学到了什么。"},
+          {id:"reveal",word:"reveal",phonetic:"/rɪˈviːl/",meaning:"v. 展示；揭示",example:"The survey may reveal a useful trend.",translation:"调查可能会揭示一个有用的趋势。"},
+          {id:"sustain",word:"sustain",phonetic:"/səˈsteɪn/",meaning:"v. 维持；支撑",example:"Small goals can sustain your motivation.",translation:"小目标能让你保持动力。"},
+          {id:"variety",word:"variety",phonetic:"/vəˈraɪəti/",meaning:"n. 多样性；种类",example:"A variety of examples makes learning more interesting.",translation:"多样的例句让学习更有趣。"}
+        ]
+      },
+      cet6: {
+        name: "六级进阶 · 示例词书", short: "CET-6", description: "用更丰富的表达扩充词汇", words: [
+          {id:"abstract",word:"abstract",phonetic:"/ˈæbstrækt/",meaning:"adj. 抽象的",example:"An abstract idea becomes clearer with an example.",translation:"有了例子，抽象的想法会更清楚。"},
+          {id:"allocate",word:"allocate",phonetic:"/ˈæləkeɪt/",meaning:"v. 分配",example:"We should allocate more time to review.",translation:"我们应该分配更多时间用于复习。"},
+          {id:"anticipate",word:"anticipate",phonetic:"/ænˈtɪsɪpeɪt/",meaning:"v. 预期；预料",example:"It helps to anticipate the questions you may face.",translation:"预想可能遇到的问题会有帮助。"},
+          {id:"coherent",word:"coherent",phonetic:"/koʊˈhɪrənt/",meaning:"adj. 连贯的；清晰的",example:"Her explanation was brief but coherent.",translation:"她的解释简短而连贯。"},
+          {id:"compatible",word:"compatible",phonetic:"/kəmˈpætəbəl/",meaning:"adj. 兼容的；相容的",example:"The new tool is compatible with older files.",translation:"新工具兼容旧文件。"},
+          {id:"constrain",word:"constrain",phonetic:"/kənˈstreɪn/",meaning:"v. 限制；约束",example:"A short deadline can constrain our choices.",translation:"紧迫的期限会限制我们的选择。"},
+          {id:"derive",word:"derive",phonetic:"/dɪˈraɪv/",meaning:"v. 获得；源自",example:"We can derive useful lessons from the experiment.",translation:"我们可以从实验中获得有用的经验。"},
+          {id:"diminish",word:"diminish",phonetic:"/dɪˈmɪnɪʃ/",meaning:"v. 减少；削弱",example:"The noise began to diminish after midnight.",translation:"午夜后噪声开始减弱。"},
+          {id:"empirical",word:"empirical",phonetic:"/ɪmˈpɪrɪkəl/",meaning:"adj. 实证的；经验的",example:"The claim needs empirical evidence.",translation:"这个说法需要实证依据。"},
+          {id:"facilitate",word:"facilitate",phonetic:"/fəˈsɪlɪteɪt/",meaning:"v. 促进；使便利",example:"Clear notes facilitate better discussion.",translation:"清晰的笔记有助于更好的讨论。"},
+          {id:"implicit",word:"implicit",phonetic:"/ɪmˈplɪsɪt/",meaning:"adj. 含蓄的；隐含的",example:"The message carried an implicit warning.",translation:"这条消息带着隐含的警告。"},
+          {id:"initiate",word:"initiate",phonetic:"/ɪˈnɪʃieɪt/",meaning:"v. 发起；开始",example:"They will initiate the project next month.",translation:"他们将于下个月启动项目。"},
+          {id:"provisional",word:"provisional",phonetic:"/prəˈvɪʒənəl/",meaning:"adj. 暂时的；临时的",example:"This is only a provisional schedule.",translation:"这只是一个暂定日程。"},
+          {id:"robust",word:"robust",phonetic:"/roʊˈbʌst/",meaning:"adj. 强健的；稳健的",example:"A robust process can handle unexpected errors.",translation:"稳健的流程可以处理意外错误。"},
+          {id:"substantial",word:"substantial",phonetic:"/səbˈstænʃəl/",meaning:"adj. 大量的；实质的",example:"The team made substantial progress this week.",translation:"团队本周取得了实质性进展。"},
+          {id:"valid",word:"valid",phonetic:"/ˈvælɪd/",meaning:"adj. 有效的；合理的",example:"That is a valid concern and deserves an answer.",translation:"这是一个合理的顾虑，值得回应。"}
+        ]
+      }
+    };
+
+    const app = document.getElementById("app");
+    let storageAvailable = true;
+    let storageWarning = "";
+    let notice = "";
+    let view = "home";
+    let session = null;
+
+    function emptyState() { return { version:1, activeBookId:"cet4", books:{ cet4:{cards:{}}, cet6:{cards:{}} } }; }
+    function localDay(date = new Date()) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+    function addDays(day, amount) { const [y,m,d] = day.split("-").map(Number); const date = new Date(y,m-1,d,12); date.setDate(date.getDate()+amount); return localDay(date); }
+    function validDay(value) { if(typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false; const [y,m,d] = value.split("-").map(Number); const date = new Date(y,m-1,d,12); return localDay(date) === value; }
+    function validateState(value) {
+      if(!value || value.version !== 1 || !BOOKS[value.activeBookId] || !value.books || typeof value.books !== "object") return false;
+      for(const id of Object.keys(BOOKS)) {
+        const cards = value.books[id]?.cards;
+        if(!cards || typeof cards !== "object" || Array.isArray(cards)) return false;
+        const validIds = new Set(BOOKS[id].words.map(word => word.id));
+        for(const [wordId, record] of Object.entries(cards)) {
+          if(!validIds.has(wordId) || !record || !Number.isInteger(record.intervalIndex) || record.intervalIndex < 0 || record.intervalIndex > 3 || !validDay(record.dueOn) || !["known","wrong"].includes(record.lastResult)) return false;
+        }
+      }
+      return true;
+    }
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return emptyState();
+        const parsed = JSON.parse(raw);
+        if(!validateState(parsed)) throw new Error("invalid learning data");
+        return parsed;
+      } catch(error) {
+        if(error instanceof SyntaxError || error.message === "invalid learning data") notice = "检测到无法读取的学习记录，已恢复初始状态；继续学习会覆盖这份损坏的记录。";
+        else { storageAvailable = false; storageWarning = "浏览器禁止本地存储，本次学习可继续，但刷新后进度不会保留。"; }
+        return emptyState();
+      }
+    }
+    let state = loadState();
+    function saveState() {
+      if(!storageAvailable) return;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+      catch(error) { storageAvailable = false; storageWarning = "保存失败：浏览器本地存储不可用。刷新后本次进度不会保留。"; }
+    }
+    function book() { return BOOKS[state.activeBookId]; }
+    function records(bookId = state.activeBookId) { return state.books[bookId].cards; }
+    function stats(bookId = state.activeBookId) {
+      const all = BOOKS[bookId].words;
+      const cards = records(bookId);
+      const learned = Object.keys(cards).length;
+      const due = Object.values(cards).filter(record => record.dueOn <= localDay()).length;
+      const mastered = Object.values(cards).filter(record => record.lastResult === "known").length;
+      return {total:all.length, learned, newCount:all.length-learned, due, mastered};
+    }
+    function getNewQueue(bookId) { return BOOKS[bookId].words.filter(word => !records(bookId)[word.id]).slice(0,10).map(word => word.id); }
+    function getDueQueue(bookId, today) { return BOOKS[bookId].words.filter(word => records(bookId)[word.id]?.dueOn <= today).map(word => word.id); }
+    function gradeWord(bookId, wordId, result, mode, today, wasWrongThisSession) {
+      const old = records(bookId)[wordId];
+      let intervalIndex = 0;
+      if(result === "known" && !wasWrongThisSession && mode === "review") intervalIndex = Math.min((old?.intervalIndex ?? 0)+1, INTERVALS.length-1);
+      records(bookId)[wordId] = { intervalIndex, dueOn:addDays(today,INTERVALS[intervalIndex]), lastResult:result };
+      saveState();
+    }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g,char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
+    function shell(content, nav = true) {
+      const date = new Date();
+      const dateText = `${date.getMonth()+1}月${date.getDate()}日 · ${["周日","周一","周二","周三","周四","周五","周六"][date.getDay()]}`;
+      const activeNotice = storageWarning || notice;
+      return `<div class="shell"><header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">词</div><div><div class="brand-name">不背单词</div><div class="brand-sub">HTML 学习演示版 · 非官方</div></div></div><div class="date-label">${dateText}</div></header><div class="notice" role="status" ${activeNotice ? "" : "hidden"}><span aria-hidden="true">●</span><span>${escapeHtml(activeNotice)}</span></div><main>${content}</main>${nav ? `<nav class="bottom-nav" aria-label="主导航"><button class="nav-button ${view === "home" ? "active" : ""}" data-action="home">首页</button><button class="nav-button ${view === "books" ? "active" : ""}" data-action="books">词书</button><button class="nav-button ${view === "progress" ? "active" : ""}" data-action="progress">学习进度</button></nav>` : ""}<p class="footnote">本页面为个人学习演示，与“不背单词”官方产品无关联。示例词条、语音和复习规则均为本地演示内容。</p></div>`;
+    }
+    function renderHome() {
+      const s = stats();
+      const pct = Math.round(s.learned/s.total*100);
+      return shell(`<div class="desktop-grid"><div class="stack"><section class="hero"><p class="eyebrow">TODAY'S WORDS</p><h1>在语境里，<br><em>遇见</em> 新单词。</h1><p>先看例句，想一想词义，再翻开答案。每天一点点，慢慢记得更牢。</p><button class="btn btn-dark" data-action="start-new" ${s.newCount ? "" : "disabled"}>开始学新词 <span aria-hidden="true">↗</span></button><div class="hero-count"><b>${s.newCount}</b><span>个待学</span></div></section><section><div class="section-title"><h2>今天的学习</h2><span>${escapeHtml(book().short)} · 示例</span></div><div class="stats"><div class="stat"><div class="num">${s.newCount}</div><div class="label">待学新词</div></div><div class="stat"><div class="num">${s.due}</div><div class="label">待复习</div></div><div class="stat"><div class="num">${s.mastered}</div><div class="label">当前记住</div></div></div></section></div><div class="stack"><section class="panel"><div class="section-title"><h2>我的词书</h2><button class="link-btn" data-action="books">切换词书 →</button></div><div class="book-head"><div class="book-icon" aria-hidden="true">${state.activeBookId === "cet4" ? "4" : "6"}</div><div><h3>${escapeHtml(book().name)}</h3><p>${escapeHtml(book().description)}</p></div></div><div class="progress-line"><div class="progress-fill" style="width:${pct}%"></div></div><div class="progress-caption"><span>已学习 ${s.learned} / ${s.total} 词</span><span>${pct}%</span></div><button class="btn btn-soft btn-full" data-action="progress">查看学习进度</button></section><section><div class="section-title"><h2>继续学习</h2></div><div class="route-list"><button class="route" data-action="start-new" ${s.newCount ? "" : "disabled"}><span class="route-icon" aria-hidden="true">✦</span><span class="route-text"><strong>学新词</strong><small>${s.newCount ? `从下一组 ${Math.min(s.newCount,10)} 词开始` : "示例词书已全部学完"}</small></span><span class="route-arrow" aria-hidden="true">›</span></button><button class="route" data-action="start-review" ${s.due ? "" : "disabled"}><span class="route-icon" aria-hidden="true">↺</span><span class="route-text"><strong>复习单词</strong><small>${s.due ? `${s.due} 词已到复习时间` : "今天没有到期的单词"}</small></span><span class="route-arrow" aria-hidden="true">›</span></button></div></section></div></div>`);
+    }
+    function renderBooks() {
+      return shell(`<div class="page-head"><button class="back" data-action="home" aria-label="返回首页">‹</button><div><h1>选择词书</h1><p>两本短词书均为本页面自写示例内容。</p></div></div><div class="book-grid">${Object.entries(BOOKS).map(([id,item]) => {const s=stats(id);return `<button class="book-option ${state.activeBookId===id?"selected":""}" data-action="select-book" data-book="${id}" aria-pressed="${state.activeBookId===id}"><div class="book-icon" aria-hidden="true">${id==="cet4"?"4":"6"}</div><h2>${escapeHtml(item.name)}</h2><p>${escapeHtml(item.description)} · 共 ${s.total} 词</p><span class="tag">${state.activeBookId===id?"当前词书":"已学 "+s.learned+" 词"}</span></button>`;}).join("")}</div>`);
+    }
+    function renderStudy() {
+      if(!session || session.index >= session.queue.length) return renderHome();
+      const item = book().words.find(word => word.id === session.queue[session.index]);
+      const pct = Math.round(session.index/session.queue.length*100);
+      const example = escapeHtml(item.example).replace(new RegExp(`\\b(${item.word})\\b`,"ig"),"<strong>$1</strong>");
+      return shell(`<div class="study-wrap"><div class="page-head"><button class="back" data-action="exit-study" aria-label="退出学习，返回首页">‹</button><div><h1>${session.mode === "new" ? "学习新词" : "复习单词"}</h1><p>${escapeHtml(book().name)} · 先回忆，再显示释义</p></div></div><div class="session-progress"><span>${session.index+1} / ${session.queue.length}</span><div class="progress-line"><div class="progress-fill" style="width:${pct}%"></div></div><span>${pct}%</span></div><article class="word-card"><div class="word-top"><span class="word-category">${session.mode === "new" ? "NEW WORD" : "REVIEW WORD"}</span><button class="audio" data-action="speak" aria-label="朗读 ${escapeHtml(item.word)}">♪</button></div><h2 class="word">${escapeHtml(item.word)}</h2><p class="phonetic">${escapeHtml(item.phonetic)}</p><div class="divider"></div><p class="example-label">IN CONTEXT · 语境例句</p><p class="example">${example}</p>${session.revealed ? `<div class="meaning"><strong>${escapeHtml(item.meaning)}</strong><p>${escapeHtml(item.translation)}</p></div>` : `<div class="meaning-placeholder">先在心里想一想词义，再显示答案。</div>`}</article><div class="study-actions">${session.revealed ? `<button class="btn btn-wrong" data-action="grade-wrong">记错了 · 再学一次</button><button class="btn btn-dark" data-action="grade-known">认识了 · 下一个</button>` : `<button class="btn btn-dark btn-full" data-action="reveal">显示释义</button>`}</div></div>`,false);
+    }
+    function renderComplete() {
+      return shell(`<div class="study-wrap"><div class="complete"><div class="complete-graphic" aria-hidden="true">✦</div><h1>这一组，学完了。</h1><p>记住每一次回想的感觉，下次复习会更轻松。</p><div class="complete-summary"><span><b>${session?.known ?? 0}</b>次认识</span><span><b>${session?.wrong ?? 0}</b>次记错</span></div><button class="btn btn-dark" data-action="home">返回首页</button></div></div>`,false);
+    }
+    function renderProgress() {
+      const s=stats(); const pct=Math.round(s.learned/s.total*100);
+      const learnedWords=book().words.filter(item => records()[item.id]);
+      return shell(`<div class="progress-panel"><div class="page-head"><button class="back" data-action="home" aria-label="返回首页">‹</button><div><h1>学习进度</h1><p>${escapeHtml(book().name)}</p></div></div><div class="panel"><div class="progress-big"><div class="progress-ring" style="--pct:${pct}" data-label="${pct}%" aria-label="已学习 ${pct}%"></div><div><h2>积累，从今天开始</h2><p>已学习 ${s.learned} / ${s.total} 词<br>还有 ${s.newCount} 个新词等待你认识</p></div></div><div class="stats"><div class="stat"><div class="num">${s.learned}</div><div class="label">已学习</div></div><div class="stat"><div class="num">${s.due}</div><div class="label">待复习</div></div><div class="stat"><div class="num">${s.mastered}</div><div class="label">当前记住</div></div></div><div class="section-title" style="margin-top:28px"><h2>学过的词</h2><span>${learnedWords.length} 词</span></div>${learnedWords.length ? `<div class="word-chip-list">${learnedWords.map(item=>`<span class="word-chip">${escapeHtml(item.word)}</span>`).join("")}</div>` : `<p class="muted">还没有学习记录。选一组新词开始吧。</p>`}</div></div>`);
+    }
+    function render(resetScroll = false) {
+      app.innerHTML = view === "home" ? renderHome() : view === "books" ? renderBooks() : view === "study" ? renderStudy() : view === "complete" ? renderComplete() : renderProgress();
+      if(resetScroll && typeof window.scrollTo === "function") window.scrollTo(0,0);
+    }
+    function startSession(mode) {
+      const today=localDay();
+      const queue=mode === "new" ? getNewQueue(state.activeBookId) : getDueQueue(state.activeBookId,today);
+      if(!queue.length) { notice=mode === "new" ? "这本示例词书已学完，试试切换词书。" : "今天没有到期的单词。"; render(); return; }
+      notice="";
+      session={mode,queue,index:0,revealed:false,retried:new Set(),wrongInSession:new Set(),known:0,wrong:0};
+      view="study"; render(true);
+    }
+    function chooseBook(id) {
+      if(!BOOKS[id]) return;
+      state.activeBookId=id; saveState(); notice=""; view="home"; render(true);
+    }
+    function handleGrade(result) {
+      if(!session || !session.revealed) return;
+      const wordId=session.queue[session.index];
+      const hadWrong=session.wrongInSession.has(wordId);
+      if(result === "wrong") {
+        session.wrong++;
+        session.wrongInSession.add(wordId);
+        if(!session.retried.has(wordId)) { session.queue.push(wordId); session.retried.add(wordId); }
+      } else session.known++;
+      gradeWord(state.activeBookId,wordId,result,session.mode,localDay(),hadWrong);
+      session.index++; session.revealed=false;
+      if(session.index >= session.queue.length) view="complete";
+      render(true);
+    }
+    function speak() {
+      const wordId=session?.queue[session.index];
+      const item=book().words.find(word => word.id === wordId);
+      if(!item) return;
+      if(!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) { notice="当前浏览器不支持语音朗读，请继续阅读单词和例句。"; render(); return; }
+      try { speechSynthesis.cancel(); const utterance=new SpeechSynthesisUtterance(item.word); utterance.lang="en-US"; utterance.rate=.88; utterance.onerror=event => { if(event.error !== "canceled" && event.error !== "interrupted") { notice="语音朗读暂时不可用，请继续阅读单词和例句。"; render(); } }; speechSynthesis.speak(utterance); }
+      catch(error) { notice="语音朗读暂时不可用，请继续阅读单词和例句。"; render(); }
+    }
+    app.addEventListener("click",event => {
+      const button=event.target.closest("button[data-action]");
+      if(!button || button.disabled) return;
+      const action=button.dataset.action;
+      if(action === "home" || action === "books" || action === "progress") { view=action; notice=""; render(true); }
+      else if(action === "select-book") chooseBook(button.dataset.book);
+      else if(action === "start-new") startSession("new");
+      else if(action === "start-review") startSession("review");
+      else if(action === "exit-study") { session=null; view="home"; render(true); }
+      else if(action === "reveal" && session) { session.revealed=true; render(); }
+      else if(action === "grade-known") handleGrade("known");
+      else if(action === "grade-wrong") handleGrade("wrong");
+      else if(action === "speak") speak();
+    });
+    render();
+  </script>
+</body>
+</html>
